@@ -4,7 +4,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd, datetime
 import seaborn as sns
-from statsmodels.tsa.stattools import adfuller
+# from statsmodels.tsa.stattools import adfuller
 import matplotlib.pyplot as plt
 import plotly.express as px
 # get_ipython().run_line_magic('matplotlib', 'inline')
