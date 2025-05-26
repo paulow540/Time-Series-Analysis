@@ -11,12 +11,12 @@ import plotly.express as px
 from time import time
 import os
 from math import sqrt
-from statsmodels.tsa.seasonal import seasonal_decompose
-from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-import itertools
-import statsmodels.api as sm
-from statsmodels.tsa.stattools import acf,pacf
-from statsmodels.tsa.arima_model import  ARIMA
+# from statsmodels.tsa.seasonal import seasonal_decompose
+# from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+# import itertools
+# import statsmodels.api as sm
+# from statsmodels.tsa.stattools import acf,pacf
+# from statsmodels.tsa.arima_model import  ARIMA
 # from sklearn import model_selection
 # from sklearn.metrics import mean_squared_error, r2_score
 # from pandas import DataFrame
