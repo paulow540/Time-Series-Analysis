@@ -1,4 +1,4 @@
-seaborn 
 plotly
-os
+plotly.express
+seaborn
 
