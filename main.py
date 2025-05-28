@@ -90,6 +90,14 @@ train_store_joined.head()
 # Distribution of sales and customers across store types
 train_store_joined.groupby('StoreType')[['Customers', 'Sales', 'SalePerCustomer']].sum().sort_values('Sales', ascending=False)
 
+fig = px.bar(train_store_joined, 
+             x= train_store_joined.index,
+             y= "Sales",
+             
+             
+             
+             )
+
 
 # Closed and zero-sales obseravtions
 train_store_joined[(train_store_joined.Open ==0) | (train_store_joined.Sales==0)].shape
