@@ -30,11 +30,11 @@ from datetime import datetime
 st.title("Time Series Analysis Forecasting  and Predicting sales Analysis")
 
 # Importing store data
-store = pd.read_csv('C:\\Users\\Administrator\\Desktop\\Femi\\rossmann-store-sales\\store.csv')
+store = pd.read_csv('store.csv')
 # Importing train data
-train = pd.read_csv('C:\\Users\\Administrator\\Desktop\\Femi\\rossmann-store-sales\\train.csv', index_col='Date', parse_dates = True)
+train = pd.read_csv('train.csv', index_col='Date', parse_dates = True)
 # Importing test data
-test = pd.read_csv('C:\\Users\\Administrator\\Desktop\\Femi\\rossmann-store-sales\\test.csv')
+test = pd.read_csv('test.csv')
 
 
 # Extracting year, month, day and week, and making new column
