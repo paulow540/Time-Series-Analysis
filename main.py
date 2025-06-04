@@ -17,7 +17,8 @@ import itertools
 import statsmodels.api as sm
 from statsmodels.tsa.stattools import acf,pacf
 from statsmodels.tsa.arima_model import  ARIMA
-from datetime import datetime
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 # from sklearn import model_selection
 # from sklearn.metrics import mean_squared_error, r2_score
 # from pandas import DataFrame
@@ -89,7 +90,7 @@ test.fillna(1, inplace=True)
 
 # Joining the tables
 train_store_joined = pd.merge(train, store, on='Store', how='inner')
-train_store_joined.head()
+
 
 # Distribution of sales and customers across store types
 train_store_joined.groupby('StoreType')[['Customers', 'Sales', 'SalePerCustomer']].sum().sort_values('Sales', ascending=False)
@@ -110,29 +111,9 @@ train_store_joined_open = train_store_joined[~((train_store_joined.Open ==0) | (
 
 
 
-# # Only use numeric columns for correlation
-# numeric_data = train_store_joined.select_dtypes(include='number')
-# # Plotly heatmap
-# fig = px.imshow(
-#     numeric_data.corr(),
-#     text_auto=True,
-#     aspect="auto",
-#     color_continuous_scale="RdBu_r",
-#     title="Correlation Heatmap of Numeric Features",
-# )
-
+# Resample weekly sales data
 # Data Preparation: input should be float type
 train['Sales'] = train['Sales'] * 1.0
-
-
-
-# Assigning one store from each category
-
-
-
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-# Resample weekly sales data
 two = st.sidebar.number_input("Enter a Weekly Sales Trend for  Stores 2", value=2)
 sales_a = train[train.Store == two]['Sales'].resample('W').sum()
 eight = st.sidebar.number_input("Enter a Weekly Sales Trend for  Stores 85", value=85)
