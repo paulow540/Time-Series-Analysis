@@ -1,3 +1,4 @@
+pip
 plotly
 plotly.express
 seaborn
