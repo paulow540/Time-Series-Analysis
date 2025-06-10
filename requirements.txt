@@ -1,5 +1,7 @@
+pandas
+numpy
 plotly
-plotly.express
-seaborn
-sklearn == 0.23.1
+statsmodels
+scikit-learn
+streamlit
 
