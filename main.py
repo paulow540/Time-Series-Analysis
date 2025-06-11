@@ -24,10 +24,10 @@ from plotly.subplots import make_subplots
 
 
 # from sklearn import model_selection
-from sklearn.metrics import mean_squared_error, r2_score
-import plotly.graph_objects as go
-from sklearn.metrics import mean_squared_error
-from math import sqrt
+# from sklearn.metrics import mean_squared_error, r2_score
+# import plotly.graph_objects as go
+# from sklearn.metrics import mean_squared_error
+# from math import sqrt
 
 
 st.title("Time Series Analysis Forecasting  and Predicting sales Analysis")
@@ -310,5 +310,5 @@ with bar3:
     fig.show()
 
     # RMSE Calculation
-    rms_arima = sqrt(mean_squared_error(actual, forecasted))
-    print("Root Mean Squared Error:", rms_arima)
+    # rms_arima = sqrt(mean_squared_error(actual, forecasted))
+    # print("Root Mean Squared Error:", rms_arima)
