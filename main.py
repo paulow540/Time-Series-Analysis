@@ -30,14 +30,15 @@ from plotly.subplots import make_subplots
 # from math import sqrt
 
 
-st.title("Time Series Analysis Forecasting  and Predicting sales Analysis")
+st.title("📈Predicting Time Series Analysis on Sale 🏦 and Forecasting", anchor=False)
+
 
 # Importing store data
-store = pd.read_csv('store.csv')
+store = pd.read_csv('C:\\Users\\Administrator\\Desktop\\Femi\\rossmann-store-sales\\store.csv')
 # Importing train data
-train = pd.read_csv('train.csv', index_col='Date', parse_dates = True)
+train = pd.read_csv('C:\\Users\\Administrator\\Desktop\\Femi\\rossmann-store-sales\\train.csv', index_col='Date', parse_dates = True)
 # Importing test data
-test = pd.read_csv('test.csv')
+test = pd.read_csv('C:\\Users\\Administrator\\Desktop\\Femi\\rossmann-store-sales\\test.csv')
 
 
 # Extracting year, month, day and week, and making new column
@@ -190,125 +191,126 @@ with bar2:
         auto_corr(sales_a)
 
   
-with bar3:
-    # Determing p,d,q combinations with AIC scores.
-    for param in pdq:
-        for param_seasonal in seasonal_pdq:
-            try:
-                mod = sm.tsa.statespace.SARIMAX(train_arima,
-                                                order=param,
-                                                seasonal_order=param_seasonal,
-                                                enforce_stationarity=False,
-                                                enforce_invertibility=False)
+# with bar3:
+#     # Determing p,d,q combinations with AIC scores.
+#     for param in pdq:
+#         for param_seasonal in seasonal_pdq:
+#             try:
+#                 mod = sm.tsa.statespace.SARIMAX(train_arima,
+#                                                 order=param,
+#                                                 seasonal_order=param_seasonal,
+#                                                 enforce_stationarity=False,
+#                                                 enforce_invertibility=False)
 
-                results = mod.fit()
+#                 results = mod.fit()
 
-                print('ARIMA{}x{}12 - AIC:{}'.format(param, param_seasonal, results.aic))
-            except:
-                continue
-    # Fitting the data to SARIMA model
-    model_sarima = sm.tsa.statespace.SARIMAX(train_arima,
-                                    order=(1, 1, 1),
-                                    seasonal_order=(0, 1, 1, 12),
-                                    enforce_stationarity=False,
-                                    enforce_invertibility=False)
+#                 print('ARIMA{}x{}12 - AIC:{}'.format(param, param_seasonal, results.aic))
+#             except:
+#                 continue
+#     # Fitting the data to SARIMA model
+#     model_sarima = sm.tsa.statespace.SARIMAX(train_arima,
+#                                     order=(1, 1, 1),
+#                                     seasonal_order=(0, 1, 1, 12),
+#                                     enforce_stationarity=False,
+#                                     enforce_invertibility=False)
 
-    results_sarima = model_sarima.fit()
+#     results_sarima = model_sarima.fit()
 
     
-    st.dataframe(results_sarima.summary().tables[1])
-    st.write("This table shows how well the model fits past sales patterns. Numbers in P>|z| show if effects are meaningful: small values (like 0.000) mean strong evidence. Large ones (like 0.184) mean weak or uncertain impact.")
+#     st.dataframe(results_sarima.summary().tables[1])
+#     st.write("This table shows how well the model fits past sales patterns. Numbers in P>|z| show if effects are meaningful: small values (like 0.000) mean strong evidence. Large ones (like 0.184) mean weak or uncertain impact.")
 
-     # Extract residuals
-    residuals = results_sarima.resid
+#      # Extract residuals
+#     residuals = results_sarima.resid
 
-    # 1. Residual Time Series
-    # fig1 = go.Figure()
-    # fig1.add_trace(go.Scatter(y=residuals, mode='lines', name='Residuals'))
-    # fig1.update_layout(title="Residuals over Time", xaxis_title="Time", yaxis_title="Residuals")
+#     # 1. Residual Time Series
+#     # fig1 = go.Figure()
+#     # fig1.add_trace(go.Scatter(y=residuals, mode='lines', name='Residuals'))
+#     # fig1.update_layout(title="Residuals over Time", xaxis_title="Time", yaxis_title="Residuals")
 
-    # # 2. Histogram of Residuals
-    # fig2 = px.histogram(residuals, nbins=30, title="Histogram of Residuals")
+#     # # 2. Histogram of Residuals
+#     # fig2 = px.histogram(residuals, nbins=30, title="Histogram of Residuals")
 
-    # # 3. Q-Q Plot
-    # qq = stats.probplot(residuals, dist="norm")
-    # fig3 = go.Figure()
-    # fig3.add_trace(go.Scatter(x=qq[0][0], y=qq[0][1], mode='markers', name='Data'))
-    # fig3.add_trace(go.Scatter(x=qq[0][0], y=qq[0][0], mode='lines', name='Ideal', line=dict(color='red')))
-    # fig3.update_layout(title="Q-Q Plot", xaxis_title="Theoretical Quantiles", yaxis_title="Sample Quantiles")
+#     # # 3. Q-Q Plot
+#     # qq = stats.probplot(residuals, dist="norm")
+#     # fig3 = go.Figure()
+#     # fig3.add_trace(go.Scatter(x=qq[0][0], y=qq[0][1], mode='markers', name='Data'))
+#     # fig3.add_trace(go.Scatter(x=qq[0][0], y=qq[0][0], mode='lines', name='Ideal', line=dict(color='red')))
+#     # fig3.update_layout(title="Q-Q Plot", xaxis_title="Theoretical Quantiles", yaxis_title="Sample Quantiles")
 
-    # # 4. ACF Plot of Residuals
-    # acf_vals = acf(residuals, nlags=40)
-    # fig4 = go.Figure()
-    # fig4.add_trace(go.Bar(x=list(range(len(acf_vals))), y=acf_vals))
-    # fig4.update_layout(title="ACF of Residuals", xaxis_title="Lag", yaxis_title="ACF")
+#     # # 4. ACF Plot of Residuals
+#     # acf_vals = acf(residuals, nlags=40)
+#     # fig4 = go.Figure()
+#     # fig4.add_trace(go.Bar(x=list(range(len(acf_vals))), y=acf_vals))
+#     # fig4.update_layout(title="ACF of Residuals", xaxis_title="Lag", yaxis_title="ACF")
 
-    # # Show all plots
-    # fig1.show()
-    # fig2.show()
-    # fig3.show()
-    # fig4.show()
+#     # # Show all plots
+#     # fig1.show()
+#     # fig2.show()
+#     # fig3.show()
+#     # fig4.show()
 
 
 
-    # Model Prediction and validation
-    # Predictions are performed for the 11th Jan' 2015 onwards of the train data.
-    date = st.date_input("Enter the time to predict", "2015-01-11")
+#     # Model Prediction and validation
+#     # Predictions are performed for the 11th Jan' 2015 onwards of the train data.
+#     date = st.date_input("Enter the time to predict")
 
-    pred = results_sarima.get_prediction(start=pd.to_datetime(date), dynamic = False)
 
-    # Get confidence intervals of forecasts
-    # Generate predictions
-    pred = results_sarima.get_prediction(start=pd.to_datetime(date), dynamic=False)
-    pred_ci = pred.conf_int()
+#     pred = results_sarima.get_prediction(start=pd.to_datetime(date), dynamic = False)
 
-    # Extract forecasted and actual data
-    forecasted = pred.predicted_mean
-    actual = train_arima["2015-01-11":]
+#     # Get confidence intervals of forecasts
+#     # Generate predictions
+#     pred = results_sarima.get_prediction(start=pd.to_datetime(date), dynamic=False)
+#     pred_ci = pred.conf_int()
 
-    # Create Plotly figure
-    fig = go.Figure()
+#     # Extract forecasted and actual data
+#     forecasted = pred.predicted_mean
+#     actual = train_arima["2015-01-11":]
 
-    # Observed values
-    fig.add_trace(go.Scatter(
-        x=train_arima["2014":].index,
-        y=train_arima["2014":].values,
-        mode='lines',
-        name='Observed',
-        line=dict(color='blue')
-    ))
+#     # Create Plotly figure
+#     fig = go.Figure()
 
-    # Predicted values
-    fig.add_trace(go.Scatter(
-        x=forecasted.index,
-        y=forecasted.values,
-        mode='lines',
-        name='One-step ahead Forecast',
-        line=dict(color='orange')
-    ))
+#     # Observed values
+#     fig.add_trace(go.Scatter(
+#         x=train_arima["2014":].index,
+#         y=train_arima["2014":].values,
+#         mode='lines',
+#         name='Observed',
+#         line=dict(color='blue')
+#     ))
 
-    # Confidence interval (shaded area)
-    fig.add_trace(go.Scatter(
-        x=pred_ci.index.tolist() + pred_ci.index[::-1].tolist(),
-        y=pred_ci.iloc[:, 0].tolist() + pred_ci.iloc[:, 1][::-1].tolist(),
-        fill='toself',
-        fillcolor='rgba(0,0,0,0.1)',
-        line=dict(color='rgba(255,255,255,0)'),
-        hoverinfo="skip",
-        name='Confidence Interval'
-    ))
+#     # Predicted values
+#     fig.add_trace(go.Scatter(
+#         x=forecasted.index,
+#         y=forecasted.values,
+#         mode='lines',
+#         name='One-step ahead Forecast',
+#         line=dict(color='orange')
+#     ))
 
-    # Final layout tweaks
-    fig.update_layout(
-        title="SARIMA Forecast with Confidence Interval",
-        xaxis_title="Date",
-        yaxis_title="Sales",
-        width=1000,
-        height=600
-    )
+#     # Confidence interval (shaded area)
+#     fig.add_trace(go.Scatter(
+#         x=pred_ci.index.tolist() + pred_ci.index[::-1].tolist(),
+#         y=pred_ci.iloc[:, 0].tolist() + pred_ci.iloc[:, 1][::-1].tolist(),
+#         fill='toself',
+#         fillcolor='rgba(0,0,0,0.1)',
+#         line=dict(color='rgba(255,255,255,0)'),
+#         hoverinfo="skip",
+#         name='Confidence Interval'
+#     ))
 
-    fig.show()
+#     # Final layout tweaks
+#     fig.update_layout(
+#         title="SARIMA Forecast with Confidence Interval",
+#         xaxis_title="Date",
+#         yaxis_title="Sales",
+#         width=1000,
+#         height=600
+#     )
 
-    # RMSE Calculation
-    # rms_arima = sqrt(mean_squared_error(actual, forecasted))
-    # print("Root Mean Squared Error:", rms_arima)
+#     fig.show()
+
+#     # RMSE Calculation
+#     # rms_arima = sqrt(mean_squared_error(actual, forecasted))
+#     # print("Root Mean Squared Error:", rms_arima)
