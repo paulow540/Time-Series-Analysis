@@ -61,26 +61,6 @@ train_store_closed.hist('DayOfWeek')
 
 
 
-# bar1, bar2 = st.tabs(["SchoolHoliday","StateHoliday"])
-
-# with bar1:
-#     # Checking whether there was a school holiday when the store was closed
-#     st.write("Checking whether there was a school holiday when the store was closed")
-#     tsc_schoolHoliday = train_store_closed['SchoolHoliday'].value_counts() #.plot(kind='bar')
-#     st.bar_chart(tsc_schoolHoliday )
-
-# with bar2:
-#     # Checking whether there was a state holiday when the store was closed
-#     st.write("Checking whether there was a state holiday when the store was closed")
-#     tsc_stateHoliday = train_store_closed['StateHoliday'].value_counts() #.plot(kind='bar')
-#     st.bar_chart(tsc_stateHoliday )
-
-
-# No. of days with closed stores
-# train[(train.Open == 0)].shape[0]
-
-# No. of days when store was opened but zero sales - might be because of external factors or refurbishmnent
-# train[(train.Open == 1) & (train.Sales == 0)].shape[0]
 
 # Replacing missing values for Competiton distance with median
 store['CompetitionDistance'].fillna(store['CompetitionDistance'].median(), inplace=True)
@@ -99,11 +79,7 @@ with st.expander("click to check the stores dataset"):
     # Distribution of sales and customers across store types
     train_store_joined.groupby('StoreType')[['Customers', 'Sales', 'SalePerCustomer']].sum().sort_values('Sales', ascending=False)
 
-    # fig = px.bar(train_store_joined, 
-    #              x= train_store_joined.index,
-    #              y= "Sales",                     
-    #              )
-
+ 
 
     # Closed and zero-sales obseravtions
     train_store_joined[(train_store_joined.Open ==0) | (train_store_joined.Sales==0)]
