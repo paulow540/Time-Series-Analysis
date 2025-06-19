@@ -1,5 +1,3 @@
-# app.py
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -63,24 +61,29 @@ try:
     rmse = sqrt(mean_squared_error(test, forecast))
     st.success(f"📊 RMSE: {rmse:.2f}")
 
-       # Combine data for interactive plotting
+    # Combine train and test using pd.concat (not .append)
+    train_test_df = pd.concat([train, test])
+    train_test_index = train.index.to_list() + test.index.to_list()
+    train_test_type = ["Train"] * len(train) + ["Test"] * len(test)
+
     forecast_plot_df = pd.DataFrame({
-        "date": train.index.append(test.index),
-        "sales": train.append(test),
-        "type": ["Train"] * len(train) + ["Test"] * len(test)
+        "date": train_test_index,
+        "sales": train_test_df.values,
+        "type": train_test_type
     })
+
     forecast_df_plot = pd.DataFrame({
         "date": forecast.index,
         "sales": forecast.values,
         "type": ["Forecast"] * len(forecast)
     })
-    
+
     combined_plot_df = pd.concat([forecast_plot_df, forecast_df_plot])
-    
+
     # Plot with Plotly
     st.subheader("📈 Forecast vs Actual (Interactive)")
     fig = go.Figure()
-    
+
     # Add traces
     for category in combined_plot_df["type"].unique():
         subset = combined_plot_df[combined_plot_df["type"] == category]
@@ -89,28 +92,27 @@ try:
             mode="lines",
             name=category
         ))
-    
-    # Layout
+
     fig.update_layout(
-        title="Sales Forecast vs Actual (Store {})".format(selected_store),
+        title=f"Sales Forecast vs Actual (Store {selected_store})",
         xaxis_title="Date",
         yaxis_title="Sales",
         hovermode="x unified",
         template="plotly_white"
     )
-    
-    # Show chart in Streamlit
+
     st.plotly_chart(fig, use_container_width=True)
-    
+
+
     #     # Forecast download
     #     forecast_df = pd.DataFrame({
-    #         "date": forecast.index,
-    #         "forecasted_sales": forecast.values,
-    #         "actual_sales": test.values
-    #     })
-    
-    #     csv = forecast_df.to_csv(index=False).encode('utf-8')
-    #     st.download_button("📥 Download Forecast CSV", csv, "sales_forecast.csv", "text/csv")
-    
+#         "date": forecast.index,
+#         "forecasted_sales": forecast.values,
+#         "actual_sales": test.values
+#     })
+
+#     csv = forecast_df.to_csv(index=False).encode('utf-8')
+#     st.download_button("📥 Download Forecast CSV", csv, "sales_forecast.csv", "text/csv")
+
 except Exception as e:
     st.error(f"Model training failed: {e}")
