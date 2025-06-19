@@ -1,7 +1,8 @@
+# app.py
+
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from sklearn.metrics import mean_squared_error
 import plotly.graph_objects as go
@@ -11,48 +12,48 @@ st.set_page_config(page_title="Sales Forecasting App", layout="wide")
 
 st.title("📈 Sales Forecasting Time Series App")
 st.markdown("""
-This app performs time series forecasting using SARIMA based on store-level sales, holidays, and promotions.
-Upload your dataset or use the default sample to get started.
+This app analyzes and forecasts store sales using a SARIMA model. It incorporates holiday and promotion effects, allowing store-wise forecasting.
 """)
 
-# Load dataset
+# Load CSV
 df = pd.read_csv("predicting_sales_time_series.csv")
-
-with st.expander("📄 Sample of Dataset"):
-    st.write(df.head())
-
-# --- Data Cleaning ---
 df['date'] = pd.to_datetime(df['date'])
-df = df.sort_values('date')
-df = df.set_index('date')
+df.sort_values('date', inplace=True)
+df.set_index('date', inplace=True)
 
-# Optional: remove outliers in sales
-q_low, q_high = df['sales'].quantile([0.01, 0.99])
-df = df[(df['sales'] >= q_low) & (df['sales'] <= q_high)]
+with st.expander("🔍 Preview Dataset"):
+    st.dataframe(df.head())
 
-# Feature engineering: Day of Week (optional)
-df['day_of_week'] = df.index.dayofweek  # 0 = Monday
-
-# Sidebar store selection
+# Sidebar selections
 store_ids = df['store_id'].unique()
-selected_store = st.sidebar.selectbox("🏪 Select Store ID", store_ids)
+selected_store = st.sidebar.selectbox("Select Store ID", store_ids)
+show_outliers = st.sidebar.checkbox("Remove Sales Outliers", value=True)
+use_lags = st.sidebar.checkbox("Include Lag Features", value=True)
 
-store_df = df[df['store_id'] == selected_store]
+store_df = df[df['store_id'] == selected_store].copy()
 
-# Plot sales
-st.subheader(f"📊 Sales Trend - Store {selected_store}")
-st.line_chart(store_df['sales'])
+# Remove outliers
+if show_outliers:
+    q1, q3 = store_df['sales'].quantile([0.25, 0.75])
+    iqr = q3 - q1
+    lower, upper = q1 - 1.5 * iqr, q3 + 1.5 * iqr
+    store_df = store_df[(store_df['sales'] >= lower) & (store_df['sales'] <= upper)]
 
-# Forecasting setup
-exog_vars = store_df[['is_holiday', 'promotion']]
+# Optional lag features
+if use_lags:
+    store_df['lag_1'] = store_df['sales'].shift(1)
+    store_df.dropna(inplace=True)
+    exog_vars = store_df[['is_holiday', 'promotion', 'lag_1']]
+else:
+    exog_vars = store_df[['is_holiday', 'promotion']]
+
 target = store_df['sales']
-
 train_size = int(len(store_df) * 0.85)
 train, test = target[:train_size], target[train_size:]
 exog_train, exog_test = exog_vars[:train_size], exog_vars[train_size:]
 
+# Modeling
 try:
-    # SARIMA model
     model = SARIMAX(train,
                     exog=exog_train,
                     order=(1, 1, 1),
@@ -61,21 +62,16 @@ try:
                     enforce_invertibility=False)
     results = model.fit(disp=False)
 
-    # pred = results.get_prediction(start=test.index[0],
-    #                               end=test.index[-1],
-    #                               exog=exog_test,
-    #                               dynamic=False)
-    pred = results.get_prediction(start=len(train),
-                              end=len(train) + len(test) - 1,
-                              exog=exog_test,
-                              dynamic=False)
-
+    pred = results.get_prediction(start=test.index[0],
+                                  end=test.index[-1],
+                                  exog=exog_test,
+                                  dynamic=False)
     forecast = pred.predicted_mean
 
     rmse = sqrt(mean_squared_error(test, forecast))
-    st.success(f"📉 RMSE: {rmse:.2f}")
+    st.success(f"✅ Model trained. RMSE: {rmse:.2f}")
 
-    # Combine for plot
+    # Combine data for plotting
     train_test_df = pd.concat([train, test])
     train_test_index = train.index.to_list() + test.index.to_list()
     train_test_type = ["Train"] * len(train) + ["Test"] * len(test)
@@ -94,36 +90,30 @@ try:
 
     combined_plot_df = pd.concat([forecast_plot_df, forecast_df_plot])
 
-    # Plot with Plotly
-    st.subheader("📈 Forecast vs Actual (Interactive)")
+    # Plotly chart
+    st.subheader("📊 Forecast vs Actual")
     fig = go.Figure()
-
     for category in combined_plot_df["type"].unique():
         subset = combined_plot_df[combined_plot_df["type"] == category]
         fig.add_trace(go.Scatter(
             x=subset["date"], y=subset["sales"],
-            mode="lines",
-            name=category
+            mode="lines", name=category
         ))
-
     fig.update_layout(
         title=f"Sales Forecast vs Actual (Store {selected_store})",
-        xaxis_title="Date",
-        yaxis_title="Sales",
-        hovermode="x unified",
-        template="plotly_white"
+        xaxis_title="Date", yaxis_title="Sales",
+        hovermode="x unified", template="plotly_white"
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    # Download forecast
+    # Downloadable forecast
     forecast_df = pd.DataFrame({
         "date": forecast.index,
         "forecasted_sales": forecast.values,
         "actual_sales": test.values
     })
-
-    csv = forecast_df.to_csv(index=False).encode('utf-8')
+    csv = forecast_df.to_csv(index=False).encode("utf-8")
     st.download_button("📥 Download Forecast CSV", csv, "sales_forecast.csv", "text/csv")
 
 except Exception as e:
-    st.error(f"⚠️ Model training failed: {e}")
+    st.error(f"❌ Model training failed: {e}")
