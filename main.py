@@ -105,7 +105,7 @@ try:
 
 
         # Forecast download
-        forecast_df = pd.DataFrame({
+    forecast_df = pd.DataFrame({
         "date": forecast.index,
         "forecasted_sales": forecast.values,
         "actual_sales": test.values
