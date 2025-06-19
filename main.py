@@ -14,7 +14,7 @@ st.title("📈 Sales Forecasting Time Series App")
 st.markdown("Upload your sales data and forecast future sales using SARIMA with exogenous variables (holiday, promotion).")
 
 # File uploader
-uploaded_file = st.file_uploader("C:\\Users\\Administrator\\Desktop\\Femi\\predicting_sales_time_series.csv", type=["csv"])
+uploaded_file = st.file_uploader("predicting_sales_time_series.csv", type=["csv"])
 
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
