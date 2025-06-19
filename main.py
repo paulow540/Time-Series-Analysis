@@ -10,32 +10,40 @@ from math import sqrt
 st.set_page_config(page_title="Sales Forecasting App", layout="wide")
 
 st.title("📈 Sales Forecasting Time Series App")
-st.markdown("""This Streamlit web app allows you to analysis a sales dataset and perform time series forecasting using the SARIMA model.
-It forecasts future sales based on historical sales, holidays,promotions and by selecting the store ID.""")
+st.markdown("""
+This app performs time series forecasting using SARIMA based on store-level sales, holidays, and promotions.
+Upload your dataset or use the default sample to get started.
+""")
 
-# File uploader
-# uploaded_file = st.file_uploader("C:\\Users\\Administrator\\Desktop\\Femi\\predicting_sales_time_series.csv", type=["csv"])
-
+# Load dataset
 df = pd.read_csv("predicting_sales_time_series.csv")
-with st.expander("Click to see the sample of the dataset"):
-    st.table(df.head(5))
 
-# Preprocessing
+with st.expander("📄 Sample of Dataset"):
+    st.write(df.head())
+
+# --- Data Cleaning ---
 df['date'] = pd.to_datetime(df['date'])
 df = df.sort_values('date')
 df = df.set_index('date')
 
+# Optional: remove outliers in sales
+q_low, q_high = df['sales'].quantile([0.01, 0.99])
+df = df[(df['sales'] >= q_low) & (df['sales'] <= q_high)]
+
+# Feature engineering: Day of Week (optional)
+df['day_of_week'] = df.index.dayofweek  # 0 = Monday
+
 # Sidebar store selection
 store_ids = df['store_id'].unique()
-selected_store = st.sidebar.selectbox("Select Store ID", store_ids)
+selected_store = st.sidebar.selectbox("🏪 Select Store ID", store_ids)
 
 store_df = df[df['store_id'] == selected_store]
 
 # Plot sales
-st.subheader(f"Sales Trend - Store {selected_store}")
+st.subheader(f"📊 Sales Trend - Store {selected_store}")
 st.line_chart(store_df['sales'])
 
-# Forecasting
+# Forecasting setup
 exog_vars = store_df[['is_holiday', 'promotion']]
 target = store_df['sales']
 
@@ -44,6 +52,7 @@ train, test = target[:train_size], target[train_size:]
 exog_train, exog_test = exog_vars[:train_size], exog_vars[train_size:]
 
 try:
+    # SARIMA model
     model = SARIMAX(train,
                     exog=exog_train,
                     order=(1, 1, 1),
@@ -53,15 +62,15 @@ try:
     results = model.fit(disp=False)
 
     pred = results.get_prediction(start=test.index[0],
-                                    end=test.index[-1],
-                                    exog=exog_test,
-                                    dynamic=False)
+                                  end=test.index[-1],
+                                  exog=exog_test,
+                                  dynamic=False)
     forecast = pred.predicted_mean
 
     rmse = sqrt(mean_squared_error(test, forecast))
-    st.success(f"📊 RMSE: {rmse:.2f}")
+    st.success(f"📉 RMSE: {rmse:.2f}")
 
-    # Combine train and test using pd.concat (not .append)
+    # Combine for plot
     train_test_df = pd.concat([train, test])
     train_test_index = train.index.to_list() + test.index.to_list()
     train_test_type = ["Train"] * len(train) + ["Test"] * len(test)
@@ -84,7 +93,6 @@ try:
     st.subheader("📈 Forecast vs Actual (Interactive)")
     fig = go.Figure()
 
-    # Add traces
     for category in combined_plot_df["type"].unique():
         subset = combined_plot_df[combined_plot_df["type"] == category]
         fig.add_trace(go.Scatter(
@@ -100,19 +108,17 @@ try:
         hovermode="x unified",
         template="plotly_white"
     )
-
     st.plotly_chart(fig, use_container_width=True)
 
+    # Download forecast
+    forecast_df = pd.DataFrame({
+        "date": forecast.index,
+        "forecasted_sales": forecast.values,
+        "actual_sales": test.values
+    })
 
-    #     # Forecast download
-    #     forecast_df = pd.DataFrame({
-#         "date": forecast.index,
-#         "forecasted_sales": forecast.values,
-#         "actual_sales": test.values
-#     })
-
-#     csv = forecast_df.to_csv(index=False).encode('utf-8')
-#     st.download_button("📥 Download Forecast CSV", csv, "sales_forecast.csv", "text/csv")
+    csv = forecast_df.to_csv(index=False).encode('utf-8')
+    st.download_button("📥 Download Forecast CSV", csv, "sales_forecast.csv", "text/csv")
 
 except Exception as e:
-    st.error(f"Model training failed: {e}")
+    st.error(f"⚠️ Model training failed: {e}")
