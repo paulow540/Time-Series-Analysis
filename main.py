@@ -61,10 +61,15 @@ try:
                     enforce_invertibility=False)
     results = model.fit(disp=False)
 
-    pred = results.get_prediction(start=test.index[0],
-                                  end=test.index[-1],
-                                  exog=exog_test,
-                                  dynamic=False)
+    # pred = results.get_prediction(start=test.index[0],
+    #                               end=test.index[-1],
+    #                               exog=exog_test,
+    #                               dynamic=False)
+    pred = results.get_prediction(start=len(train),
+                              end=len(train) + len(test) - 1,
+                              exog=exog_test,
+                              dynamic=False)
+
     forecast = pred.predicted_mean
 
     rmse = sqrt(mean_squared_error(test, forecast))
