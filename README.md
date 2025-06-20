@@ -1,5 +1,5 @@
 # 📈 Sales Forecasting Time Series App
-This Streamlit web app allows you to upload a sales dataset and perform time series forecasting using the SARIMA model. It forecasts future sales based on historical sales, holidays, and promotions.
+This Streamlit web app allows you to analysis a sales dataset and perform time series forecasting using the SARIMA model. It forecasts future sales based on historical sales, holidays, and promotions.
 
 ## 🔍 Features
 - 📤 Import  your custom sales dataset (CSV)
